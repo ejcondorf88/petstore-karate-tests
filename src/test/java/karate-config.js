@@ -6,15 +6,15 @@ function fn() {
   }
   var config = {
     env: env,
-    baseUrl: 'https://automationexercise.com/api'
+    baseUrl: 'https://petstore.swagger.io/v2'
   };
-  
+
   // Cargar helpers desde utils
   config.generateEmail = read('classpath:utils/generateEmail.js')();
+  config.generateUsername = read('classpath:utils/generateUsername.js')();
   config.loadUserData = read('classpath:utils/loadUserData.js')();
-  config.loadProductData = read('classpath:utils/loadProductData.js')();
   config.deepCopy = read('classpath:utils/deepCopy.js')();
-  
+
   if (env == 'dev') {
     // Personalizaciones por entorno dev
   } else if (env == 'e2e') {
