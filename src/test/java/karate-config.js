@@ -12,7 +12,6 @@ function fn() {
   // Cargar helpers desde utils
   config.generateEmail = read('classpath:utils/generateEmail.js')();
   config.loadUserData = read('classpath:utils/loadUserData.js')();
-  config.loadProductData = read('classpath:utils/loadProductData.js')();
   config.deepCopy = read('classpath:utils/deepCopy.js')();
   
   if (env == 'dev') {

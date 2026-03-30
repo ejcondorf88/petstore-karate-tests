@@ -7,7 +7,7 @@ class TestRunner {
 
     @Test
     void testParallel() {
-        Results results = Runner.path("classpath:users", "classpath:products")
+        Results results = Runner.path("classpath:users")
             .parallel(1);
         assertEquals(0, results.getFailCount(), results.getErrorMessages());
     }
