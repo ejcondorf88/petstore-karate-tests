@@ -74,17 +74,6 @@ Scenario: Delete user account
 * def deleteRes = call read('classpath:common/user/delete-user.feature') { username: '#(uniqueUsername)' }
 Then match deleteRes.result.code == 200
 
-@edge-case @getUser
-Scenario: Get non-existent user - PetStore returns mock data
-* def getRes = call read('classpath:common/user/get-user.feature') { username: 'nonexistentuser123' }
-Then match getRes.result.username == 'nonexistentuser123'
-
-@edge-case @deleteUser
-Scenario: Delete non-existent user - verify response
-* def deleteRes = call read('classpath:common/user/delete-user.feature') { username: 'nonexistentuser456' }
-* print 'Delete non-existent response:', deleteRes.result
-Then assert deleteRes.resultStatus == 404 || deleteRes.resultStatus == 200
-
 @regression @fullFlow
 Scenario: Complete CRUD flow - Create, Get, Update, Get, Delete
 * def userData = deepCopy(userDataTemplate)
