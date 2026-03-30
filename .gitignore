@@ -1,0 +1,9 @@
+.DS_Store
+*.jar
+*.iml
+target/
+.idea/
+.vscode/
+
+.allure/
+logs/
