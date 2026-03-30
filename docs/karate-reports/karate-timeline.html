@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Karate Timeline</title>
+    <style>
+      body, html { font-family: arial, sans-serif; font-size: 11pt; }
+      #visualization { box-sizing: border-box; width: 100%; height: 300px; }
+      .vis-item.failed { background-color: #F2928C; }
+      .page-heading { padding: 0.5em; margin-bottom: 0.5em; background-color: lightcyan; border: 1px solid gray; }
+    </style>
+    <script src="res/vis.min.js"></script>
+    <link href="res/vis.min.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="page-heading">
+      <a href="karate-summary.html">Summary</a>
+    </div>     
+    <div id="visualization"></div>
+    <script>
+var groups = [{"content":"main","id":1}];
+var items = [{"id":1,"group":1,"content":"users/users[1:9]","start":1774891852202,"end":1774891853228,"title":"users/users[1:9] 12:30:52.202-12:30:53.228 Create user account"},{"id":2,"group":1,"content":"users/users[2:18]","start":1774891853233,"end":1774891853806,"title":"users/users[2:18] 12:30:53.233-12:30:53.806 Get user by username"},{"id":3,"group":1,"content":"users/users[3:32]","start":1774891853810,"end":1774891854357,"title":"users/users[3:32] 12:30:53.810-12:30:54.357 Update user account - update name and email"},{"id":4,"group":1,"content":"users/users[4:47]","start":1774891854361,"end":1774891855140,"title":"users/users[4:47] 12:30:54.361-12:30:55.140 Get updated user and verify changes"},{"id":5,"group":1,"content":"users/users[5:66]","start":1774891855143,"end":1774891855643,"title":"users/users[5:66] 12:30:55.143-12:30:55.643 Delete user account"},{"id":6,"group":1,"content":"users/users[6:78]","start":1774891855646,"end":1774891856988,"title":"users/users[6:78] 12:30:55.646-12:30:56.988 Complete CRUD flow - Create, Get, Update, Get, Delete"}];
+</script>
+    <script>
+      var container = document.getElementById('visualization');
+      var timeline = new vis.Timeline(container);
+      timeline.setOptions({groupOrder: 'content'});
+      timeline.setGroups(new vis.DataSet(groups));
+      timeline.setItems(new vis.DataSet(items));
+    </script>
+  </body>
+</html>

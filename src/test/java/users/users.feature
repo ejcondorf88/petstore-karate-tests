@@ -1,105 +1,114 @@
 @users
-Feature: User API test flows
+Feature: User API test flows - PetStore API
 
 Background:
-  * url baseUrl
-  * def userDataTemplate = read('classpath:data/user-data.json')
-
+* url baseUrl
+* def userDataTemplate = read('classpath:data/user-data.json')
 
 @smoke @regression @post @createUser
 Scenario: Create user account
-  * def userData = deepCopy(userDataTemplate)
-  * set userData.email = generateEmail()
-  * def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  Then match createRes.result.responseCode == 201
-  And match createRes.result.message == 'User created!'
+* def userData = deepCopy(userDataTemplate)
+* def uniqueUsername = generateUsername()
+* set userData.username = uniqueUsername
+* set userData.email = generateEmail()
+* def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
+Then match createRes.result.code == 200
 
+@smoke @regression @get @getUser
+Scenario: Get user by username
+* def userData = deepCopy(userDataTemplate)
+* def uniqueUsername = generateUsername()
+* set userData.username = uniqueUsername
+* set userData.email = generateEmail()
+* def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
+* match createRes.result.code == 200
 
-@regression @put @updateUser
-Scenario: Update user account
-  * def userData = deepCopy(userDataTemplate)
-  * set userData.email = generateEmail()
-  
-  # First create user
-  * def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  * match createRes.result.responseCode == 201
-  
-  # Then update
-  * def updateData = deepCopy(userData)
-  * set updateData.name = 'Updated Name'
-  * set updateData.title = 'Mrs'
-  
-  * def updateRes = call read('classpath:common/user/update-user.feature') { updateData: '#(updateData)' }
-  
-  Then match updateRes.result.responseCode == 200
-  And match updateRes.result.message == 'User updated!'
+* def getRes = call read('classpath:common/user/get-user.feature') { username: '#(uniqueUsername)' }
+Then match getRes.result.id == userData.id
+And match getRes.result.username == uniqueUsername
+And match getRes.result.email == userData.email
 
-@regression @delete @deleteUser
+@smoke @regression @put @updateUser
+Scenario: Update user account - update name and email
+* def userData = deepCopy(userDataTemplate)
+* def uniqueUsername = generateUsername()
+* set userData.username = uniqueUsername
+* set userData.email = generateEmail()
+* def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
+* match createRes.result.code == 200
+
+* def updateData = deepCopy(userData)
+* set updateData.firstName = 'UpdatedFirstName'
+* set updateData.email = 'updated_' + generateEmail()
+* def updateRes = call read('classpath:common/user/update-user.feature') { username: '#(uniqueUsername)', updateData: '#(updateData)' }
+Then match updateRes.result.code == 200
+
+@smoke @regression @get @verifyUpdate
+Scenario: Get updated user and verify changes
+* def userData = deepCopy(userDataTemplate)
+* def uniqueUsername = generateUsername()
+* set userData.username = uniqueUsername
+* set userData.email = generateEmail()
+* def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
+* match createRes.result.code == 200
+
+* def updateData = deepCopy(userData)
+* set updateData.firstName = 'UpdatedFirstName'
+* set updateData.email = 'updated_' + generateEmail()
+* def updateRes = call read('classpath:common/user/update-user.feature') { username: '#(uniqueUsername)', updateData: '#(updateData)' }
+* match updateRes.result.code == 200
+
+* def getRes = call read('classpath:common/user/get-user.feature') { username: '#(uniqueUsername)' }
+Then match getRes.result.firstName == 'UpdatedFirstName'
+And match getRes.result.email == updateData.email
+
+@smoke @regression @delete @deleteUser
 Scenario: Delete user account
-  * def userData = deepCopy(userDataTemplate)
-  * set userData.email = generateEmail()
-  
-  # First create user
-  * def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  * match createRes.result.responseCode == 201
-  
-  # Then delete
-  * def deleteData = { email: '#(userData.email)', password: '#(userData.password)' }
-  * print 'deleteData:', deleteData
-  * def deleteRes = call read('classpath:common/user/delete-user.feature') { deleteData: '#(deleteData)' }
-  
-  Then match deleteRes.result.responseCode == 200
-  And match deleteRes.result.message == 'Account deleted!'
+* def userData = deepCopy(userDataTemplate)
+* def uniqueUsername = generateUsername()
+* set userData.username = uniqueUsername
+* set userData.email = generateEmail()
+* def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
+* match createRes.result.code == 200
 
+* def deleteRes = call read('classpath:common/user/delete-user.feature') { username: '#(uniqueUsername)' }
+Then match deleteRes.result.code == 200
 
-@edge-case @createUser
-Scenario: Create user with existing email - should return 400
-  * def userData = deepCopy(userDataTemplate)
-  * set userData.email = 'test@example.com'
-  
-  # First create user
-  * def createRes1 = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  
-  # Try to create again with same email
-  * def createRes2 = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  
-  Then match createRes2.result.responseCode == 400
-  And match createRes2.result.message == 'Email already exists!'
+@regression @fullFlow
+Scenario: Complete CRUD flow - Create, Get, Update, Get, Delete
+* def userData = deepCopy(userDataTemplate)
+* def uniqueUsername = generateUsername()
+* set userData.username = uniqueUsername
+* set userData.email = generateEmail()
 
+# Step 1: Create user
+* def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
+* match createRes.result.code == 200
+* print 'Created user:', uniqueUsername
 
-@edge-case @createUser
-Scenario: Create user with missing required fields - API accepts empty name
-  * def userData = deepCopy(userDataTemplate)
-  * set userData.email = generateEmail()
-  * set userData.name = ''
-  
-  * def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  
-  Then match createRes.result.responseCode == 201
-  And match createRes.result.message == 'User created!'
+# Step 2: Get user and verify
+* def getRes1 = call read('classpath:common/user/get-user.feature') { username: '#(uniqueUsername)' }
+* match getRes1.result.username == uniqueUsername
+* match getRes1.result.email == userData.email
+* print 'Retrieved user:', getRes1.result
 
+# Step 3: Update user (name and email)
+* def updateData = deepCopy(userData)
+* set updateData.firstName = 'UpdatedName'
+* set updateData.email = 'updated_' + generateEmail()
+* def updateRes = call read('classpath:common/user/update-user.feature') { username: '#(uniqueUsername)', updateData: '#(updateData)' }
+* match updateRes.result.code == 200
+* print 'Updated user:', updateRes.result
 
-@edge-case @updateUser
-Scenario: Update user without email parameter - API returns 404 (account not found)
-  * def userData = deepCopy(userDataTemplate)
-  * set userData.email = generateEmail()
-  
-  # First create user
-  * def createRes = call read('classpath:common/user/create-user.feature') { userData: '#(userData)' }
-  * match createRes.result.responseCode == 201
-  
-  # Try update without email (required field) - returns 404
-  * def updateData = { name: 'Updated Name', email: '', password: 'password123' }
-  * def updateRes = call read('classpath:common/user/update-user.feature') { updateData: '#(updateData)' }
-  
-  Then match updateRes.result.responseCode == 404
-  And match updateRes.result.message == 'Account not found!'
+# Step 4: Get updated user and verify changes
+* def getRes2 = call read('classpath:common/user/get-user.feature') { username: '#(uniqueUsername)' }
+* match getRes2.result.firstName == 'UpdatedName'
+* match getRes2.result.email == updateData.email
+* print 'Verified updated user:', getRes2.result
 
+# Step 5: Delete user
+* def deleteRes = call read('classpath:common/user/delete-user.feature') { username: '#(uniqueUsername)' }
+* match deleteRes.result.code == 200
+* print 'Deleted user:', deleteRes.result
 
-@edge-case @deleteUser
-Scenario: Delete user with wrong credentials - should return 404
-  * def deleteData = { email: 'nonexistent@test.com', password: 'wrongpassword' }
-  * def deleteRes = call read('classpath:common/user/delete-user.feature') { deleteData: '#(deleteData)' }
-  
-  Then match deleteRes.result.responseCode == 404
-  And match deleteRes.result.message == 'Account not found!'
+* print 'Full CRUD flow completed successfully!'
