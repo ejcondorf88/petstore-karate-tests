@@ -73,6 +73,10 @@ target/karate-reports/karate-summary.html
 
 Abrir este archivo en un navegador para ver los resultados detallados.
 
+### Reportes Online (GitHub Pages)
+Los reportes también están disponibles online en:
+**[https://ejcondorf88.github.io/petstore-karate-tests/karate-reports/karate-summary.html](https://ejcondorf88.github.io/petstore-karate-tests/karate-reports/karate-summary.html)**
+
 ## Escenarios de Prueba
 
 Los tests implementan los siguientes escenarios:
